@@ -19,10 +19,10 @@ import (
 )
 
 func main() {
-	var apiKey = os.Getenv("HEALTHCHECKSIO_API_KEY") // See https://healthchecks.io/docs/api/
+	apiKey := os.Getenv("HEALTHCHECKSIO_API_KEY") // See https://healthchecks.io/docs/api/
 
-	var client = healthchecksio.NewClient(apiKey)
-	var check = healthchecksio.Healthcheck{
+	client := healthchecksio.NewClient(apiKey)
+	check := healthchecksio.Healthcheck{
 		Name: "My first test",
 		Tags: "go ftw",
 	}
