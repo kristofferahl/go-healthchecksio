@@ -13,7 +13,7 @@ func assertString(t *testing.T, expected string, actual string) {
 	}
 }
 
-func configureClient() Client {
+func configureClient() *Client {
 	envKey := "HEALTHCHECKSIO_API_KEY"
 	apiKey := os.Getenv(envKey)
 	if apiKey == "" {

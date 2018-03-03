@@ -31,8 +31,8 @@ type apiErrorResponse struct {
 }
 
 // NewClient creates a new client
-func NewClient(apiKey string) Client {
-	return Client{
+func NewClient(apiKey string) *Client {
+	return &Client{
 		APIKey:      apiKey,
 		BaseURL:     baseURL,
 		ContentType: "application/json",
