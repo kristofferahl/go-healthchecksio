@@ -37,6 +37,10 @@ func main() {
 }
 ```
 
+## Documentation
+
+Docs can be found at [godoc.org](https://godoc.org/github.com/kristofferahl/go-healthchecksio).
+
 ## Developing
 
 Running the tests requires a valid healthchecks.io API key (See https://healthchecks.io/docs/api/). Make sure the following environment variables are set.
