@@ -19,6 +19,7 @@ type Healthcheck struct {
 
 // HealthcheckResponse represents a healthcheck api response
 type HealthcheckResponse struct {
+	Channels  string `json:"channels,omitempty"`
 	Grace     int    `json:"grace,omitempty"`
 	LastPing  string `json:"last_ping,omitempty"`
 	Name      string `json:"name,omitempty"`
