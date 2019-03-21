@@ -31,7 +31,7 @@ type HealthcheckResponse struct {
 	Status    string `json:"status,omitempty"`
 	Tags      string `json:"tags,omitempty"`
 	Timeout   int    `json:"timeout,omitempty"`
-	Timezone  string `json:"tz,omitempty,omitempty"`
+	Timezone  string `json:"tz,omitempty"`
 	UpdateURL string `json:"update_url,omitempty"`
 }
 
