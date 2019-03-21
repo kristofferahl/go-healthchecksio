@@ -35,6 +35,13 @@ type HealthcheckResponse struct {
 	UpdateURL string `json:"update_url,omitempty"`
 }
 
+// HealthcheckChannelResponse represents a channel response of healthcheck api
+type HealthcheckChannelResponse struct {
+	ID   string `json:"id,omitempty"`
+	Name string `json:"name,omitempty"`
+	Kind string `json:"kind,omitempty"`
+}
+
 // ToJSON returns a json representation of a healthcheck data
 func (hc *Healthcheck) ToJSON() (string, error) {
 	b, err := json.Marshal(hc)
@@ -60,6 +67,23 @@ func (hc *HealthcheckResponse) ToJSON() (string, error) {
 }
 
 func (hc *HealthcheckResponse) String() string {
+	json, err := hc.ToJSON()
+	if err != nil {
+		return err.Error()
+	}
+	return json
+}
+
+// ToJSON returns a json representation of a healthcheck channel
+func (hc *HealthcheckChannelResponse) ToJSON() (string, error) {
+	b, err := json.MarshalIndent(hc, "", "  ")
+	if err != nil {
+		return "", err
+	}
+	return string(b), nil
+}
+
+func (hc *HealthcheckChannelResponse) String() string {
 	json, err := hc.ToJSON()
 	if err != nil {
 		return err.Error()

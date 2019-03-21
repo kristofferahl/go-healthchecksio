@@ -26,6 +26,10 @@ type apiListResponse struct {
 	Data []*HealthcheckResponse `json:"checks"`
 }
 
+type apiListChannelsResponse struct {
+	Data []*HealthcheckChannelResponse `json:"channels"`
+}
+
 type apiErrorResponse struct {
 	Message string `json:"error"`
 }
@@ -172,6 +176,22 @@ func (c *Client) Delete(id string) (*HealthcheckResponse, error) {
 	return &resp, nil
 }
 
+// GetAllChannels returns all channels
+func (c *Client) GetAllChannels() ([]*HealthcheckChannelResponse, error) {
+	body, err := c.get("/channels/")
+	if err != nil {
+		return nil, err
+	}
+
+	r, err := toAPIListChannelsResponse(body)
+	if err != nil {
+		return nil, err
+	}
+
+	resp := (*r).Data
+	return resp, nil
+}
+
 func toAPIListResponse(body []byte) (*apiListResponse, error) {
 	var s = new(apiListResponse)
 	err := json.Unmarshal(body, &s)
@@ -180,6 +200,12 @@ func toAPIListResponse(body []byte) (*apiListResponse, error) {
 
 func toAPIResponse(body []byte) (*apiResponse, error) {
 	var s = new(apiResponse)
+	err := json.Unmarshal(body, &s)
+	return s, err
+}
+
+func toAPIListChannelsResponse(body []byte) (*apiListChannelsResponse, error) {
+	var s = new(apiListChannelsResponse)
 	err := json.Unmarshal(body, &s)
 	return s, err
 }
