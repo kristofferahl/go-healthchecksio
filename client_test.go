@@ -92,4 +92,14 @@ func TestClient(t *testing.T) {
 	}
 
 	log.Printf("[DEBUG] Deleted %s", deleted)
+
+	// GetAllChannels
+	// ----------------------------------------
+	channels, err := client.GetAllChannels()
+	if err != nil {
+		t.Error("Fetching channels failed.", err)
+		return
+	}
+
+	log.Printf("[DEBUG] Fetched %s", channels)
 }
