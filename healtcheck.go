@@ -5,6 +5,39 @@ import (
 	"strings"
 )
 
+// APIError represents an error that occured when talkinging to the Healthchecks.io api
+type APIError struct {
+	err        string
+	method     string
+	url        string
+	status     string
+	statusCode int
+}
+
+func (e *APIError) Error() string {
+	return e.err
+}
+
+// Method returns the HTTP request method
+func (e *APIError) Method() string {
+	return e.method
+}
+
+// URL returns the HTTP request URL
+func (e *APIError) URL() string {
+	return e.url
+}
+
+// Status returns the HTTP response status
+func (e *APIError) Status() string {
+	return e.status
+}
+
+// StatusCode returns the HTTP response status code
+func (e *APIError) StatusCode() int {
+	return e.statusCode
+}
+
 // Healthcheck represents a healthcheck
 type Healthcheck struct {
 	Channels string   `json:"channels,omitempty"`

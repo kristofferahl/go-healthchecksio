@@ -44,6 +44,27 @@ func NewClient(apiKey string) *Client {
 	}
 }
 
+func wrapError(err error, req *http.Request, res *http.Response) error {
+	if err != nil {
+		status := ""
+		statusCode := 0
+
+		if res != nil {
+			status = res.Status
+			statusCode = res.StatusCode
+		}
+
+		return &APIError{
+			err:        err.Error(),
+			method:     req.Method,
+			url:        req.URL.String(),
+			status:     status,
+			statusCode: statusCode,
+		}
+	}
+	return nil
+}
+
 func (c *Client) request(method string, path string, reader io.Reader) ([]byte, error) {
 	url := baseURL + path
 	req, _ := http.NewRequest(method, url, reader)
@@ -52,24 +73,24 @@ func (c *Client) request(method string, path string, reader io.Reader) ([]byte, 
 
 	log.Printf("[DEBUG] HTTP %s %s", method, url)
 
-	resp, err := c.HTTPClient.Do(req)
+	res, err := c.HTTPClient.Do(req)
 	if err != nil {
-		return nil, err
+		return nil, wrapError(err, req, nil)
 	}
 
-	defer resp.Body.Close()
-	body, err := ioutil.ReadAll(resp.Body)
+	defer res.Body.Close()
+	body, err := ioutil.ReadAll(res.Body)
 
-	if resp.StatusCode >= 300 {
-		errorResp := new(apiErrorResponse)
-		if err = json.Unmarshal(body, &errorResp); err != nil {
-			return nil, fmt.Errorf("%s. %s %s >> %s", err, method, url, resp.Status)
+	if res.StatusCode >= 300 {
+		errorRes := new(apiErrorResponse)
+		if err = json.Unmarshal(body, &errorRes); err != nil {
+			return nil, wrapError(err, req, res)
 		}
 
-		return nil, fmt.Errorf("%s. %s %s >> %s", errorResp.Message, method, url, resp.Status)
+		return nil, wrapError(fmt.Errorf("response error, %s", errorRes.Message), req, res)
 	}
 
-	return body, err
+	return body, wrapError(err, req, res)
 }
 
 func (c *Client) get(path string) ([]byte, error) {
