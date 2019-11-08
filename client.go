@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
-	"log"
 	"net/http"
 )
 
@@ -18,6 +17,7 @@ type Client struct {
 	BaseURL     string
 	ContentType string
 	HTTPClient  *http.Client
+	Log         Logger
 }
 
 type apiResponse HealthcheckResponse
@@ -41,6 +41,7 @@ func NewClient(apiKey string) *Client {
 		BaseURL:     baseURL,
 		ContentType: "application/json",
 		HTTPClient:  &http.Client{},
+		Log:         &NoOpLogger{},
 	}
 }
 
@@ -71,7 +72,7 @@ func (c *Client) request(method string, path string, reader io.Reader) ([]byte, 
 	req.Header.Set("Content-Type", c.ContentType)
 	req.Header.Set("X-Api-Key", c.APIKey)
 
-	log.Printf("[DEBUG] HTTP %s %s", method, url)
+	c.Log.Debugf("HTTP %s %s", method, url)
 
 	res, err := c.HTTPClient.Do(req)
 	if err != nil {

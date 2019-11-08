@@ -1,8 +1,6 @@
 package healthchecksio
 
 import (
-	"fmt"
-	"log"
 	"os"
 	"testing"
 )
@@ -14,13 +12,16 @@ func assertString(t *testing.T, expected string, actual string) {
 }
 
 func configureClient() *Client {
+	l := &StandardLogger{}
 	envKey := "HEALTHCHECKSIO_API_KEY"
 	apiKey := os.Getenv(envKey)
 	if apiKey == "" {
-		log.Println(fmt.Sprintf("API Key must be set (env: %s)", envKey))
+		l.Errorf("API Key must be set (env: %s)", envKey)
 		os.Exit(1)
 	}
-	return NewClient(apiKey)
+	c := NewClient(apiKey)
+	c.Log = l
+	return c
 }
 
 func TestClient(t *testing.T) {
@@ -39,7 +40,7 @@ func TestClient(t *testing.T) {
 		return
 	}
 
-	log.Printf("[DEBUG] Fetched %s", checks)
+	client.Log.Debugf("Fetched %s", checks)
 
 	// Create
 	// ----------------------------------------
@@ -55,7 +56,7 @@ func TestClient(t *testing.T) {
 		return
 	}
 
-	log.Printf("[DEBUG] Created %s", created)
+	client.Log.Debugf("[DEBUG] Created %s", created)
 
 	// Update
 	// ----------------------------------------
@@ -71,7 +72,7 @@ func TestClient(t *testing.T) {
 		return
 	}
 
-	log.Printf("[DEBUG] Updated %s", updated)
+	client.Log.Debugf("[DEBUG] Updated %s", updated)
 
 	// Pause
 	// ----------------------------------------
@@ -81,7 +82,7 @@ func TestClient(t *testing.T) {
 		return
 	}
 
-	log.Printf("[DEBUG] Paused %s", paused)
+	client.Log.Debugf("[DEBUG] Paused %s", paused)
 
 	// Delete
 	// ----------------------------------------
@@ -91,7 +92,7 @@ func TestClient(t *testing.T) {
 		return
 	}
 
-	log.Printf("[DEBUG] Deleted %s", deleted)
+	client.Log.Debugf("[DEBUG] Deleted %s", deleted)
 
 	// GetAllChannels
 	// ----------------------------------------
@@ -101,5 +102,5 @@ func TestClient(t *testing.T) {
 		return
 	}
 
-	log.Printf("[DEBUG] Fetched %s", channels)
+	client.Log.Debugf("[DEBUG] Fetched %s", channels)
 }
