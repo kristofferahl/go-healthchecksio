@@ -79,6 +79,8 @@ func (c *Client) request(method string, path string, reader io.Reader) ([]byte, 
 		return nil, wrapError(err, req, nil)
 	}
 
+	c.Log.Infof("HTTP %s %s - %s", method, url, res.Status)
+
 	defer res.Body.Close()
 	body, err := ioutil.ReadAll(res.Body)
 
