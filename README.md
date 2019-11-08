@@ -41,6 +41,16 @@ func main() {
 
 Docs can be found at [godoc.org](https://godoc.org/github.com/kristofferahl/go-healthchecksio).
 
+## A note on logging
+
+By default this package uses the NoOpLogger, essentially turning off all logging. For basic logging you may configure the client to use the included logger StandardLogger. You may also choose to supply your own logger by implementing the Logger interface.
+
+```go
+client := healthchecksio.NewClient(apiKey)
+client.Log = &healthchecksio.StandardLogger{}
+```
+
+
 ## Developing
 
 Running the tests requires a valid healthchecks.io API key (See https://healthchecks.io/docs/api/). Make sure the following environment variables are set.
