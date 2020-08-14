@@ -15,7 +15,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/kristofferahl/go-healthchecksio"
+	"github.com/icaho/go-healthchecksio"
 )
 
 func main() {
@@ -39,7 +39,7 @@ func main() {
 
 ## Documentation
 
-Docs can be found at [godoc.org](https://godoc.org/github.com/kristofferahl/go-healthchecksio).
+Docs can be found at [godoc.org](https://godoc.org/github.com//go-healthchecksio).
 
 ## Developing
 
