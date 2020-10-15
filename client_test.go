@@ -60,8 +60,9 @@ func TestClient(t *testing.T) {
 	// Update
 	// ----------------------------------------
 	updated, err := client.Update(created.ID(), Healthcheck{
-		Name: "testcheck",
-		Tags: "test devops go",
+		Name:        "testcheck",
+		Tags:        "test devops go",
+		Description: "Adding a description",
 		Unique: []string{
 			"name",
 		},
