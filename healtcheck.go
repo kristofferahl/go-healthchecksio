@@ -7,34 +7,36 @@ import (
 
 // Healthcheck represents a healthcheck
 type Healthcheck struct {
-	Channels 	string   `json:"channels,omitempty"`
-	Grace    	int      `json:"grace,omitempty"`
-	Name     	string   `json:"name,omitempty"`
-	Schedule 	string   `json:"schedule,omitempty"`
-	Tags     	string   `json:"tags,omitempty"`
-	Timeout  	int      `json:"timeout,omitempty"`
-	Timezone 	string   `json:"tz,omitempty"`
-	Unique   	[]string `json:"unique,omitempty"`
+	Channels    string   `json:"channels,omitempty"`
+	Grace       int      `json:"grace,omitempty"`
+	Name        string   `json:"name,omitempty"`
+	Schedule    string   `json:"schedule,omitempty"`
+	Tags        string   `json:"tags,omitempty"`
+	Timeout     int      `json:"timeout,omitempty"`
+	Timezone    string   `json:"tz,omitempty"`
+	Unique      []string `json:"unique,omitempty"`
 	Description string   `json:"desc,omitempty"`
+	Methods     string   `json:"methods,omniempty"`
 }
 
 // HealthcheckResponse represents a healthcheck api response
 type HealthcheckResponse struct {
-	Channels  	string `json:"channels,omitempty"`
-	Grace     	int    `json:"grace,omitempty"`
-	LastPing  	string `json:"last_ping,omitempty"`
-	Name      	string `json:"name,omitempty"`
-	NextPing  	string `json:"next_ping,omitempty"`
-	PauseURL  	string `json:"pause_url,omitempty"`
-	Pings     	int    `json:"n_pings,omitempty"`
-	PingURL   	string `json:"ping_url,omitempty"`
-	Schedule  	string `json:"schedule,omitempty"`
-	Status    	string `json:"status,omitempty"`
-	Tags      	string `json:"tags,omitempty"`
-	Timeout   	int    `json:"timeout,omitempty"`
-	Timezone  	string `json:"tz,omitempty"`
-	UpdateURL 	string `json:"update_url,omitempty"`
-	Description string   `json:"desc,omitempty"`
+	Channels    string `json:"channels,omitempty"`
+	Grace       int    `json:"grace,omitempty"`
+	LastPing    string `json:"last_ping,omitempty"`
+	Name        string `json:"name,omitempty"`
+	NextPing    string `json:"next_ping,omitempty"`
+	PauseURL    string `json:"pause_url,omitempty"`
+	Pings       int    `json:"n_pings,omitempty"`
+	PingURL     string `json:"ping_url,omitempty"`
+	Schedule    string `json:"schedule,omitempty"`
+	Status      string `json:"status,omitempty"`
+	Tags        string `json:"tags,omitempty"`
+	Timeout     int    `json:"timeout,omitempty"`
+	Timezone    string `json:"tz,omitempty"`
+	UpdateURL   string `json:"update_url,omitempty"`
+	Description string `json:"desc,omitempty"`
+	Methods     string `json:"methods,omniempty"`
 }
 
 // HealthcheckChannelResponse represents a channel response of healthcheck api
