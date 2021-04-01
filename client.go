@@ -45,7 +45,7 @@ func NewClient(apiKey string) *Client {
 }
 
 func (c *Client) request(method string, path string, reader io.Reader) ([]byte, error) {
-	url := baseURL + path
+	url := c.BaseURL + path
 	req, _ := http.NewRequest(method, url, reader)
 	req.Header.Set("Content-Type", c.ContentType)
 	req.Header.Set("X-Api-Key", c.APIKey)
