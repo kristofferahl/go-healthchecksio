@@ -66,6 +66,7 @@ func TestClient(t *testing.T) {
 		Unique: []string{
 			"name",
 		},
+		Channels: "email-me",
 	})
 	if err != nil {
 		t.Error("Updating healthcheck failed.", err)
@@ -83,6 +84,20 @@ func TestClient(t *testing.T) {
 	}
 
 	log.Printf("[DEBUG] Paused %s", paused)
+
+	// GetAll
+	// ----------------------------------------
+	checks, err = client.GetAll()
+	if err != nil {
+		t.Error("Fetching healthchecks failed.", err)
+		return
+	}
+
+	log.Printf("[DEBUG] Fetched %s", checks)
+
+	if len(checks) < 1 {
+		t.Error("Expected at least 1 healthcheck.", checks)
+	}
 
 	// Delete
 	// ----------------------------------------
