@@ -1,4 +1,4 @@
-module github.com/kristofferahl/go-healthchecksio
+module github.com/kristofferahl/go-healthchecksio/v2
 
 go 1.19
 
