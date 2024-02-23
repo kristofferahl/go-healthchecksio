@@ -147,6 +147,41 @@ func TestClient(t *testing.T) {
 				g.Assert(updated.Timeout).Equal(check.Timeout)
 				g.Assert(updated.Status).Equal("new")
 			})
+
+			g.It("updates check with channel", func() {
+				dc, err := getChannel(client, defaultChannel)
+				g.Assert(err).Equal(nil)
+
+				// Add channel
+				update1, err := client.Update(created.ID(), Healthcheck{
+					Channels: dc.Name,
+				})
+				g.Assert(err).Equal(nil)
+				g.Assert(update1.Channels).Equal(dc.ID)
+
+				// Remove channel
+				update2, err := client.Update(created.ID(), Healthcheck{
+					Channels: "",
+				})
+				g.Assert(err).Equal(nil)
+				g.Assert(update2.Channels).Equal("")
+			})
+
+			g.It("updates check with methods", func() {
+				// Set methods
+				update1, err := client.Update(created.ID(), Healthcheck{
+					Methods: "POST",
+				})
+				g.Assert(err).Equal(nil)
+				g.Assert(update1.Methods).Equal("POST")
+
+				// Remove methods
+				update2, err := client.Update(created.ID(), Healthcheck{
+					Methods: "",
+				})
+				g.Assert(err).Equal(nil)
+				g.Assert(update2.Methods).Equal("")
+			})
 		})
 
 		g.Describe("pause", func() {
