@@ -1,23 +1,16 @@
 package healthchecksio
 
 import (
-	"fmt"
 	"log"
 	"os"
 	"testing"
 )
 
-func assertString(t *testing.T, expected string, actual string) {
-	if actual != expected {
-		t.Errorf("Expected string of %s but got %s", expected, actual)
-	}
-}
-
 func configureClient() *Client {
 	envKey := "HEALTHCHECKSIO_API_KEY"
 	apiKey := os.Getenv(envKey)
 	if apiKey == "" {
-		log.Println(fmt.Sprintf("API Key must be set (env: %s)", envKey))
+		log.Printf("API Key must be set (env: %s)\n", envKey)
 		os.Exit(1)
 	}
 	return NewClient(apiKey)
