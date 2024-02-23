@@ -8,22 +8,24 @@ import (
 // Healthcheck represents a healthcheck
 type Healthcheck struct {
 	Channels    string   `json:"channels"`
+	Description string   `json:"desc,omitempty"`
 	Grace       int      `json:"grace,omitempty"`
+	Methods     string   `json:"methods"`
 	Name        string   `json:"name,omitempty"`
 	Schedule    string   `json:"schedule,omitempty"`
 	Tags        string   `json:"tags,omitempty"`
 	Timeout     int      `json:"timeout,omitempty"`
 	Timezone    string   `json:"tz,omitempty"`
 	Unique      []string `json:"unique,omitempty"`
-	Description string   `json:"desc,omitempty"`
-	Methods     string   `json:"methods"`
 }
 
 // HealthcheckResponse represents a healthcheck api response
 type HealthcheckResponse struct {
 	Channels    string `json:"channels,omitempty"`
+	Description string `json:"desc,omitempty"`
 	Grace       int    `json:"grace,omitempty"`
 	LastPing    string `json:"last_ping,omitempty"`
+	Methods     string `json:"methods,omitempty"`
 	Name        string `json:"name,omitempty"`
 	NextPing    string `json:"next_ping,omitempty"`
 	PauseURL    string `json:"pause_url,omitempty"`
@@ -35,15 +37,13 @@ type HealthcheckResponse struct {
 	Timeout     int    `json:"timeout,omitempty"`
 	Timezone    string `json:"tz,omitempty"`
 	UpdateURL   string `json:"update_url,omitempty"`
-	Description string `json:"desc,omitempty"`
-	Methods     string `json:"methods,omitempty"`
 }
 
 // HealthcheckChannelResponse represents a channel response of healthcheck api
 type HealthcheckChannelResponse struct {
 	ID   string `json:"id,omitempty"`
-	Name string `json:"name,omitempty"`
 	Kind string `json:"kind,omitempty"`
+	Name string `json:"name,omitempty"`
 }
 
 // ToJSON returns a json representation of a healthcheck data
