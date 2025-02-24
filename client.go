@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"log"
 	"net/http"
 )
@@ -58,7 +57,7 @@ func (c *Client) request(method string, path string, reader io.Reader) ([]byte, 
 	}
 
 	defer resp.Body.Close()
-	body, err := ioutil.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
 
 	if resp.StatusCode >= 300 {
 		errorResp := new(apiErrorResponse)
