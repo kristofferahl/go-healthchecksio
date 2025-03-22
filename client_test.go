@@ -10,7 +10,7 @@ import (
 	"testing"
 	"time"
 
-	. "github.com/franela/goblin"
+	"github.com/stretchr/testify/assert"
 )
 
 const (
@@ -50,10 +50,10 @@ func configureClient() *Client {
 	return NewClient(apiKey)
 }
 
-func cleanupTestData(t *testing.T, client *Client) {
+func cleanupTestData(tb testing.TB, client *Client) {
 	checks, err := client.GetAll()
 	if err != nil {
-		t.Error("Test cleanup failed, fetching all healthchecks.", err)
+		tb.Error("Test cleanup failed, fetching all healthchecks.", err)
 		return
 	}
 
@@ -64,7 +64,7 @@ func cleanupTestData(t *testing.T, client *Client) {
 
 		_, err := client.Delete(check.ID())
 		if err != nil {
-			t.Error("Test cleanup failed, deleting healthcheck.", err)
+			tb.Error("Test cleanup failed, deleting healthcheck.", err)
 			return
 		}
 	}
@@ -83,53 +83,70 @@ func getChannel(client *Client, name string) (*HealthcheckChannelResponse, error
 	return nil, fmt.Errorf("channel not found: %s", name)
 }
 
+// You can use testing.T, if you want to test the code without benchmarking
+func setupSuite(tb testing.TB) (teardown func(tb testing.TB), client *Client) {
+	log.Println("setup suite")
+
+	client = configureClient()
+	if client.APIKey == "" {
+		tb.Error("API key must be set.")
+	}
+	cleanupTestData(tb, client)
+
+	// Return a function to teardown the test
+	return func(tb testing.TB) {
+		log.Println("teardown suite")
+	}, client
+}
+
+// Almost the same as the above, but this one is for single test instead of collection of tests
+func setupTest(tb testing.TB, client *Client) func(tb testing.TB) {
+	log.Println("setup test")
+
+	return func(tb testing.TB) {
+		log.Println("teardown test")
+		cleanupTestData(tb, client)
+	}
+}
+
 func TestClient(t *testing.T) {
-	g := Goblin(t)
+	teardownSuite, client := setupSuite(t)
+	defer teardownSuite(t)
 
-	var client *Client
+	createCheck := func(t *testing.T) *HealthcheckResponse {
+		check := newCheck()
+		c, err := client.Create(check)
+		if err != nil {
+			t.Error("Test setup failed.", err)
+			return nil
+		}
+		return c
+	}
 
-	g.Describe("client", func() {
-		g.Before(func() {
-			client = configureClient()
-			if client.APIKey == "" {
-				t.Error("API key must be set.")
-			}
-			cleanupTestData(t, client)
-		})
+	t.Run("client", func(t *testing.T) {
+		teardownTest := setupTest(t, client)
+		defer teardownTest(t)
 
-		g.After(func() {
-			cleanupTestData(t, client)
-		})
-
-		g.Describe("create", func() {
-			g.It("creates check", func() {
+		t.Run("create", func(t *testing.T) {
+			t.Run("creates check", func(t *testing.T) {
 				check := newCheck()
 				created, err := client.Create(check)
 
-				g.Assert(err).Equal(nil)
-				g.Assert(created != nil).IsTrue("expected check, %v", created)
-				g.Assert(created.Name).Equal(check.Name)
-				g.Assert(created.Description).Equal(check.Description)
-				g.Assert(created.Tags).Equal(check.Tags)
-				g.Assert(created.Grace).Equal(check.Grace)
-				g.Assert(created.Timeout).Equal(check.Timeout)
-				g.Assert(created.Status).Equal("new")
+				assert.NoError(t, err)
+				assert.NotNil(t, created, "expected check, %v", created)
+				assert.Equal(t, check.Name, created.Name)
+				assert.Equal(t, check.Description, created.Description)
+				assert.Equal(t, check.Tags, created.Tags)
+				assert.Equal(t, check.Grace, created.Grace)
+				assert.Equal(t, check.Timeout, created.Timeout)
+				assert.Equal(t, "new", created.Status)
 			})
 		})
 
-		g.Describe("update", func() {
-			var created *HealthcheckResponse
-			g.BeforeEach(func() {
-				check := newCheck()
-				c, err := client.Create(check)
-				if err != nil {
-					t.Error("Test setup failed.", err)
-					return
-				}
-				created = c
-			})
+		t.Run("update", func(t *testing.T) {
+			created := createCheck(t)
 
-			g.It("updates check", func() {
+			t.Run("updates check", func(t *testing.T) {
 				check := newCheck()
 				check.Description = "Basic check updated"
 				check.Tags = "test devops updated"
@@ -138,132 +155,111 @@ func TestClient(t *testing.T) {
 
 				updated, err := client.Update(created.ID(), check)
 
-				g.Assert(err).Equal(nil)
-				g.Assert(updated != nil).IsTrue("expected check, %v", updated)
-				g.Assert(updated.Name).Equal(check.Name)
-				g.Assert(updated.Description).Equal(check.Description)
-				g.Assert(updated.Tags).Equal(check.Tags)
-				g.Assert(updated.Grace).Equal(check.Grace)
-				g.Assert(updated.Timeout).Equal(check.Timeout)
-				g.Assert(updated.Status).Equal("new")
+				assert.NoError(t, err)
+				assert.NotNil(t, updated, "expected check, %v", updated)
+				assert.Equal(t, check.Name, updated.Name)
+				assert.Equal(t, check.Description, updated.Description)
+				assert.Equal(t, check.Tags, updated.Tags)
+				assert.Equal(t, check.Grace, updated.Grace)
+				assert.Equal(t, check.Timeout, updated.Timeout)
+				assert.Equal(t, "new", updated.Status)
 			})
 
-			g.It("updates check with channel", func() {
+			t.Run("updates check with channel", func(t *testing.T) {
 				dc, err := getChannel(client, defaultChannel)
-				g.Assert(err).Equal(nil)
+				assert.NoError(t, err)
 
 				// Add channel
 				update1, err := client.Update(created.ID(), Healthcheck{
 					Channels: dc.Name,
 				})
-				g.Assert(err).Equal(nil)
-				g.Assert(update1.Channels).Equal(dc.ID)
+				assert.NoError(t, err)
+				assert.Equal(t, dc.ID, update1.Channels)
 
 				// Remove channel
 				update2, err := client.Update(created.ID(), Healthcheck{
 					Channels: "",
 				})
-				g.Assert(err).Equal(nil)
-				g.Assert(update2.Channels).Equal("")
+				assert.NoError(t, err)
+				assert.Equal(t, "", update2.Channels)
 			})
 
-			g.It("updates check with methods", func() {
+			t.Run("updates check with methods", func(t *testing.T) {
 				// Set methods
 				update1, err := client.Update(created.ID(), Healthcheck{
 					Methods: "POST",
 				})
-				g.Assert(err).Equal(nil)
-				g.Assert(update1.Methods).Equal("POST")
+				assert.NoError(t, err)
+				assert.Equal(t, "POST", update1.Methods)
 
 				// Remove methods
 				update2, err := client.Update(created.ID(), Healthcheck{
 					Methods: "",
 				})
-				g.Assert(err).Equal(nil)
-				g.Assert(update2.Methods).Equal("")
+				assert.NoError(t, err)
+				assert.Equal(t, "", update2.Methods)
 			})
 		})
 
-		g.Describe("pause", func() {
-			var created *HealthcheckResponse
-			g.BeforeEach(func() {
-				check := newCheck()
-				c, err := client.Create(check)
-				if err != nil {
-					t.Error("Test setup failed.", err)
-					return
-				}
-				created = c
-			})
+		t.Run("pause", func(t *testing.T) {
+			created := createCheck(t)
 
-			g.It("pauses check", func() {
+			t.Run("pauses check", func(t *testing.T) {
 				paused, err := client.Pause(created.ID())
-				g.Assert(err).Equal(nil)
-				g.Assert(paused.Status).Equal("paused")
+				assert.NoError(t, err)
+				assert.Equal(t, "paused", paused.Status)
 			})
 		})
+	})
 
-		g.Describe("delete", func() {
-			var created *HealthcheckResponse
-			g.BeforeEach(func() {
-				check := newCheck()
-				c, err := client.Create(check)
-				if err != nil {
-					t.Error("Test setup failed.", err)
+	t.Run("delete", func(t *testing.T) {
+		created := createCheck(t)
+
+		t.Run("deletes check", func(t *testing.T) {
+			_, err := client.Delete(created.ID())
+			assert.NoError(t, err)
+
+			all, err := client.GetAll()
+			assert.NoError(t, err)
+			for _, c := range all {
+				assert.NotEqual(t, created.ID(), c.ID())
+			}
+		})
+	})
+
+	t.Run("get all", func(t *testing.T) {
+		created := createCheck(t)
+
+		t.Run("gets checks", func(t *testing.T) {
+			checks, err := client.GetAll()
+			assert.NoError(t, err)
+			assert.NotNil(t, checks, "expected checks, %v", checks)
+			assert.GreaterOrEqual(t, len(checks), 1, "expected at least 1 check, %v", checks)
+
+			for _, check := range checks {
+				if check.ID() == created.ID() {
+					assert.Equal(t, created.Name, check.Name)
 					return
 				}
-				created = c
-			})
+			}
 
-			g.It("deletes check", func() {
-				_, err := client.Delete(created.ID())
-				g.Assert(err).Equal(nil)
-			})
+			t.Error(fmt.Errorf("expected check not found, %s", created.ID()))
 		})
+	})
 
-		g.Describe("get all", func() {
-			var created *HealthcheckResponse
-			g.BeforeEach(func() {
-				check := newCheck()
-				c, err := client.Create(check)
-				if err != nil {
-					t.Error("Test setup failed.", err)
+	t.Run("get channels", func(t *testing.T) {
+		t.Run("gets channels", func(t *testing.T) {
+			channels, err := client.GetAllChannels()
+			assert.NoError(t, err)
+			assert.GreaterOrEqual(t, len(channels), 1, "expected at least 1 channel, %v", channels)
+
+			for _, channel := range channels {
+				if channel.Name == defaultChannel {
 					return
 				}
-				created = c
-			})
+			}
 
-			g.It("gets checks", func() {
-				checks, err := client.GetAll()
-				g.Assert(checks != nil).IsTrue("expected checks, %v", checks)
-				g.Assert(err).Equal(nil)
-				g.Assert(len(checks) > 0).IsTrue("expected at least 1 check, %v", checks)
-
-				for _, check := range checks {
-					if check.ID() == created.ID() {
-						g.Assert(check.Name).Equal(created.Name)
-						return
-					}
-				}
-
-				g.Fail(fmt.Errorf("expected check not found, %s", created.ID()))
-			})
-		})
-
-		g.Describe("get channels", func() {
-			g.It("gets channels", func() {
-				channels, err := client.GetAllChannels()
-				g.Assert(err).Equal(nil)
-				g.Assert(len(channels) > 0).IsTrue("expected at least 1 channel, %v", channels)
-
-				for _, channel := range channels {
-					if channel.Name == defaultChannel {
-						return
-					}
-				}
-
-				g.Fail(fmt.Errorf("expected default channel not found, %s", defaultChannel))
-			})
+			t.Error(fmt.Errorf("expected default channel not found, %s", defaultChannel))
 		})
 	})
 }
