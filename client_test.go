@@ -96,6 +96,7 @@ func setupSuite(tb testing.TB) (teardown func(tb testing.TB), client *Client) {
 	// Return a function to teardown the test
 	return func(tb testing.TB) {
 		log.Println("teardown suite")
+		cleanupTestData(tb, client)
 	}, client
 }
 
