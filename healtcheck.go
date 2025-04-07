@@ -12,6 +12,7 @@ type Healthcheck struct {
 	Grace       int      `json:"grace,omitempty"`
 	Methods     string   `json:"methods"`
 	Name        string   `json:"name,omitempty"`
+	Slug        string   `json:"slug,omitempty"`
 	Schedule    string   `json:"schedule,omitempty"`
 	Tags        string   `json:"tags,omitempty"`
 	Timeout     int      `json:"timeout,omitempty"`
@@ -27,6 +28,7 @@ type HealthcheckResponse struct {
 	LastPing    string `json:"last_ping,omitempty"`
 	Methods     string `json:"methods,omitempty"`
 	Name        string `json:"name,omitempty"`
+	Slug        string `json:"slug,omitempty"`
 	NextPing    string `json:"next_ping,omitempty"`
 	PauseURL    string `json:"pause_url,omitempty"`
 	Pings       int    `json:"n_pings,omitempty"`
