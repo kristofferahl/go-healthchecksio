@@ -101,7 +101,7 @@ func setupSuite(tb testing.TB) (teardown func(tb testing.TB), client *Client) {
 }
 
 // Almost the same as the above, but this one is for single test instead of collection of tests
-func setupTest(tb testing.TB, client *Client) func(tb testing.TB) {
+func setupTest(_ testing.TB, client *Client) func(tb testing.TB) {
 	log.Println("setup test")
 
 	return func(tb testing.TB) {
@@ -142,6 +142,16 @@ func TestClient(t *testing.T) {
 				assert.Equal(t, check.Timeout, created.Timeout)
 				assert.Equal(t, "new", created.Status)
 			})
+
+			t.Run("creates check with slug", func(t *testing.T) {
+				check := newCheck()
+				check.Slug = "my-favourite-check"
+				created, err := client.Create(check)
+
+				assert.NoError(t, err)
+				assert.NotNil(t, created, "expected check, %v", created)
+				assert.Equal(t, check.Slug, created.Slug)
+			})
 		})
 
 		t.Run("update", func(t *testing.T) {
@@ -153,6 +163,7 @@ func TestClient(t *testing.T) {
 				check.Tags = "test devops updated"
 				check.Grace = 100
 				check.Timeout = 100
+				check.Slug = "one-check-to-rule-them-all"
 
 				updated, err := client.Update(created.ID(), check)
 
@@ -164,6 +175,7 @@ func TestClient(t *testing.T) {
 				assert.Equal(t, check.Grace, updated.Grace)
 				assert.Equal(t, check.Timeout, updated.Timeout)
 				assert.Equal(t, "new", updated.Status)
+				assert.Equal(t, check.Slug, updated.Slug)
 			})
 
 			t.Run("updates check with channel", func(t *testing.T) {
